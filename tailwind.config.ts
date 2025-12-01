@@ -81,6 +81,12 @@ export default {
           busy: "rgb(239 68 68)",
           offline: "rgb(156 163 175)",
         },
+        booking: {
+          planning: "hsl(var(--status-planning) / <alpha-value>)",
+          tentative: "hsl(var(--status-tentative) / <alpha-value>)",
+          confirmed: "hsl(var(--status-confirmed) / <alpha-value>)",
+          cancelled: "hsl(var(--status-cancelled) / <alpha-value>)",
+        },
       },
       fontFamily: {
         sans: ["var(--font-sans)"],
