@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { format, startOfMonth, endOfMonth } from "date-fns";
-import { AlertTriangle, Calendar, Download, Clock, Building, User } from "lucide-react";
+import { AlertTriangle, Calendar, Download, Clock, Building, User, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,9 +17,12 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Header } from "@/components/header";
 import { EmptyState } from "@/components/empty-state";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { BookingWithRelations, Room, Editor } from "@shared/schema";
 
 export default function ConflictReportPage() {
+  const { toast } = useToast();
   const [fromDate, setFromDate] = useState(format(startOfMonth(new Date()), "yyyy-MM-dd"));
   const [toDate, setToDate] = useState(format(endOfMonth(new Date()), "yyyy-MM-dd"));
   const [selectedRoom, setSelectedRoom] = useState<string>("all");
@@ -43,6 +46,38 @@ export default function ConflictReportPage() {
   const { data: editors = [] } = useQuery<Editor[]>({
     queryKey: ["/api/editors"],
   });
+
+  // Mutation to resolve conflict - confirm one booking, cancel the other
+  const resolveConflictMutation = useMutation({
+    mutationFn: async ({ confirmBookingId, cancelBookingId }: { confirmBookingId: number; cancelBookingId: number }) => {
+      // Cancel the other booking with conflict resolution reason
+      await apiRequest("POST", `/api/bookings/${cancelBookingId}/cancel`, {
+        reason: "Cancelled due to Conflict Resolution"
+      });
+      return { confirmBookingId, cancelBookingId };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ predicate: (query) => 
+        typeof query.queryKey[0] === 'string' && 
+        (query.queryKey[0].startsWith('/api/bookings') || query.queryKey[0].startsWith('/api/reports/conflicts'))
+      });
+      toast({ title: "Conflict resolved successfully", description: "The selected booking has been confirmed and the other has been cancelled." });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error resolving conflict",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleConfirmBooking = (confirmBooking: BookingWithRelations, cancelBooking: BookingWithRelations) => {
+    resolveConflictMutation.mutate({
+      confirmBookingId: confirmBooking.id,
+      cancelBookingId: cancelBooking.id
+    });
+  };
 
   const handleExport = () => {
     const csvContent = conflicts.map(c => 
@@ -208,6 +243,18 @@ export default function ConflictReportPage() {
                               <span>{conflict.booking1.editor.name}</span>
                             </div>
                           )}
+                          <div className="flex items-center gap-2 mt-3">
+                            <Button
+                              size="sm"
+                              variant="default"
+                              onClick={() => handleConfirmBooking(conflict.booking1, conflict.booking2)}
+                              disabled={resolveConflictMutation.isPending}
+                              data-testid={`button-confirm-booking1-${index}`}
+                            >
+                              <Check className="h-3 w-3 mr-1" />
+                              Keep This
+                            </Button>
+                          </div>
                         </div>
 
                         <div className="p-3 rounded-md bg-muted/50">
@@ -232,8 +279,23 @@ export default function ConflictReportPage() {
                               <span>{conflict.booking2.editor.name}</span>
                             </div>
                           )}
+                          <div className="flex items-center gap-2 mt-3">
+                            <Button
+                              size="sm"
+                              variant="default"
+                              onClick={() => handleConfirmBooking(conflict.booking2, conflict.booking1)}
+                              disabled={resolveConflictMutation.isPending}
+                              data-testid={`button-confirm-booking2-${index}`}
+                            >
+                              <Check className="h-3 w-3 mr-1" />
+                              Keep This
+                            </Button>
+                          </div>
                         </div>
                       </div>
+                      <p className="text-xs text-muted-foreground mt-3">
+                        Click "Keep This" on the booking you want to confirm. The other booking will be automatically cancelled.
+                      </p>
                     </CardContent>
                   </Card>
                 ))}

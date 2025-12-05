@@ -14,6 +14,8 @@ import {
   endOfWeek,
   isBefore,
   startOfDay,
+  setMonth,
+  setYear,
 } from "date-fns";
 import {
   ChevronLeft,
@@ -22,6 +24,7 @@ import {
   CalendarDays,
   Filter,
   EyeOff,
+  CalendarIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -41,6 +44,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -53,6 +61,14 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
 import type { BookingWithRelations, Room } from "@shared/schema";
+
+const MONTHS = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
+];
+
+// Generate years from 2020 to 2030
+const YEARS = Array.from({ length: 11 }, (_, i) => 2020 + i);
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -188,6 +204,66 @@ export default function BookingPage() {
             <Button variant="outline" size="sm" onClick={handleToday} data-testid="button-today">
               Today
             </Button>
+            
+            {/* Mini Calendar Year/Month Selector */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="icon" data-testid="button-calendar-picker">
+                  <CalendarIcon className="h-4 w-4" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-4" align="start">
+                <div className="space-y-4">
+                  <div className="text-sm font-medium">Jump to Date</div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Month</Label>
+                      <Select 
+                        value={currentMonth.getMonth().toString()} 
+                        onValueChange={(value) => {
+                          // Normalize to start of month to prevent overflow (e.g., Jan 31 -> Feb would become Mar)
+                          const normalized = startOfMonth(currentMonth);
+                          setCurrentMonth(setMonth(normalized, parseInt(value)));
+                        }}
+                      >
+                        <SelectTrigger className="w-full" data-testid="select-month-picker">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {MONTHS.map((month, index) => (
+                            <SelectItem key={month} value={index.toString()}>
+                              {month}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Year</Label>
+                      <Select 
+                        value={currentMonth.getFullYear().toString()} 
+                        onValueChange={(value) => {
+                          // Normalize to start of month to prevent overflow
+                          const normalized = startOfMonth(currentMonth);
+                          setCurrentMonth(setYear(normalized, parseInt(value)));
+                        }}
+                      >
+                        <SelectTrigger className="w-full" data-testid="select-year-picker">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {YEARS.map((year) => (
+                            <SelectItem key={year} value={year.toString()}>
+                              {year}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">

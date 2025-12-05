@@ -1,0 +1,294 @@
+Project Name: PRISM – Post-Production Management System
+Strict Instructions:
+
+❌ Do NOT change the dashboard layout or structure
+
+❌ Do NOT break any existing workflow
+
+✅ Fix only logic, UI behavior, calendar behavior, profile edit, logs, and conflict workflow
+
+✅ Use existing database
+
+✅ Apply only light blue theme (no redesign)
+
+✅ 1. ADMIN PROFILE (AD ICON) – VIEW + EDIT BUT NOT UPDATING (FIX)
+❌ Current Problem:
+
+Clicking AD icon opens profile
+
+But cannot update Name, Email, Mobile, or Password
+
+✅ Required Fix:
+
+Clicking AD icon → Open full Profile View/Edit mode
+
+Allow editable fields:
+
+Name
+
+Email
+
+Mobile
+
+Password (with confirmation)
+
+✅ Save button must properly:
+
+Validate input
+
+Update backend
+
+Update UI instantly
+
+✅ Show success toast:
+
+Profile updated successfully
+
+
+✅ Only Admin can edit:
+
+Role
+
+Company
+
+✅ 2. EXISTING BOOKING MUST OPEN WITH FILLED DATA & CORRECT DATE
+❌ Current Problem:
+
+Existing booking opens partially empty or with wrong date
+
+✅ Required Fix:
+
+On click of any calendar booking:
+
+Open Edit Booking Mode
+
+Auto-fill:
+
+Room
+
+Customer
+
+Project
+
+Contact Person
+
+Editor
+
+✅ Correct Booking Date
+
+From Time
+
+To Time
+
+Actual From
+
+Actual To
+
+Break Hours
+
+Status
+
+✅ Data must load using booking_id from DB
+
+❌ No blank reset allowed
+
+✅ 3. HEADER DATE MUST ALWAYS SHOW LIVE CURRENT DATE
+
+✅ The header date must:
+
+Auto-refresh daily
+
+Always show:
+
+Today’s real system date
+
+
+✅ If user changes dashboard calendar → header date must still show live today date, NOT selected month
+
+✅ 4. LONG CUSTOMER NAME – KEEP 3 DOT ICON (NOT HIDE)
+❌ Current Problem:
+
+If customer name is long → 3 dots icon is hidden
+
+✅ Required Behavior:
+
+Always show 3-dot menu icon
+
+If name is long:
+
+✅ Show:
+
+Half Name...
+
+
+✅ On Hover → Show full name tooltip
+
+✅ On Click Booking → Show full customer name
+
+❌ Never hide the 3-dot icon
+
+✅ 5. MONTH START / END BLANK DATES – MAKE FULLY CLICKABLE
+❌ Current Problem:
+
+Dates like 1, 2, 3, 4 (grey or white cells)
+
+Cannot add booking there
+
+Only update/edit allowed
+
+✅ Required Fix:
+
+All visible dates inside calendar grid must be fully active
+
+✅ Allow:
+
+New booking creation
+
+Edit existing booking
+
+✅ Even if month start/end overlap previous or next month
+
+❌ No disabled blank white cells
+
+✅ 6. PROPER BOOKING LOGS – FULL ACTIVITY TRACKING
+
+✅ Every booking must maintain full log history:
+
+Created time
+
+Edited time
+
+Status change
+
+Room change
+
+Editor change
+
+Time change
+
+Cancel action
+
+✅ Log must display:
+
+In booking footer OR
+
+In booking side panel
+
+✅ Log Format:
+
+Editor Name | Action | Date | Time | Old Value → New Value
+
+✅ 7. DASHBOARD TODAY BUTTON + MINI CALENDAR ICON (ALL YEARS)
+✅ Required Feature:
+
+Add a small Calendar Icon beside “Today” button
+
+On click:
+
+Open Year Selector Calendar
+
+User can:
+
+Select any Year
+
+Select any Month
+
+Select any Date
+
+On selection:
+
+Dashboard must jump directly to:
+✅ That selected month view
+
+✅ Does NOT affect live header date
+
+✅ 8. COLOR THEME – PRISM HEADER SAME, REST LIGHT BLUE
+
+✅ Keep:
+
+PRISM heading left side → SAME
+
+✅ Change:
+
+Below sections → Apply Light Blue Theme
+
+Operations
+
+Masters
+
+Reports
+
+Forms
+
+Filters
+
+Tables
+
+✅ Color Rule:
+
+Sidebar: Light Blue
+
+Page Background: Soft Light Blue
+
+Cards: White
+
+Buttons: Blue
+
+Success: Soft Green
+
+Cancel: Soft Red
+
+❌ Do NOT change:
+
+Layout
+
+Grid
+
+Dashboard structure
+
+✅ 9. CONFLICT REPORT – CONFIRM OR CANCEL ACTION FLOW
+✅ New Required Option:
+
+In Conflict Report:
+
+User must be able to:
+✅ Select ONE booking → Confirm
+✅ Remaining conflicting bookings → Auto Cancel
+
+✅ Auto-cancelled bookings must:
+
+Move into:
+✅ Dashboard “Cancelled” section
+
+Show:
+
+Cancelled due to Conflict Resolution
+
+
+✅ Confirmed booking must:
+
+Remain in calendar
+
+Remove all conflict flags
+
+✅ FINAL ACCEPTANCE CRITERIA
+
+After implementation:
+
+✅ Admin profile updates properly
+✅ Booking opens with correct filled data & date
+✅ Header always shows real current date
+✅ Long names show half + “…” + full on hover
+✅ All calendar dates are active & clickable
+✅ Booking logs fully visible
+✅ Dashboard mini calendar works for all years
+✅ Light blue theme applied correctly
+✅ Conflict report confirm-cancel flow works
+✅ Cancelled bookings reflect in dashboard
+
+✅ SAFE OPTIONAL ENHANCEMENTS (DO NOT BREAK FLOW)
+
+✅ Smooth hover animation
+✅ Tooltip for long names
+✅ Calendar zoom animation
+✅ Log export (CSV/PDF)

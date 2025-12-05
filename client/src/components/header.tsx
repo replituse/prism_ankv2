@@ -1,5 +1,6 @@
+import { useState, useEffect } from "react";
 import { format } from "date-fns";
-import { CalendarIcon, Building2 } from "lucide-react";
+import { CalendarIcon, Building2, Clock } from "lucide-react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -32,10 +33,19 @@ export function Header({
   showCompanySelector = true 
 }: HeaderProps) {
   const { selectedDate, setSelectedDate, company, setCompany } = useAuth();
+  const [liveDate, setLiveDate] = useState(new Date());
 
   const { data: companies = [] } = useQuery<Company[]>({
     queryKey: ["/api/companies"],
   });
+
+  // Update live date every minute to keep it current
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLiveDate(new Date());
+    }, 60000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 flex h-14 items-center gap-4 border-b bg-background px-4">
@@ -48,6 +58,12 @@ export function Header({
       )}
 
       <div className="flex items-center gap-2 ml-auto">
+        {/* Always show live current date */}
+        <div className="flex items-center gap-1.5 text-sm text-muted-foreground" data-testid="header-live-date">
+          <Clock className="h-4 w-4" />
+          <span>{format(liveDate, "EEEE, d MMMM yyyy")}</span>
+        </div>
+
         {showCompanySelector && companies.length > 0 && (
           <Select 
             value={company?.id?.toString() || ""} 

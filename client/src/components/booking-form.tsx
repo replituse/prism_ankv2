@@ -120,6 +120,27 @@ export function BookingForm({ open, onOpenChange, booking, defaultDate }: Bookin
     enabled: !!selectedCustomerId,
   });
 
+  // Reset form when booking changes or dialog opens
+  useEffect(() => {
+    if (open) {
+      form.reset({
+        roomId: booking?.roomId?.toString() || "",
+        customerId: booking?.customerId?.toString() || "",
+        projectId: booking?.projectId?.toString() || "",
+        contactId: booking?.contactId?.toString() || "",
+        editorId: booking?.editorId?.toString() || "",
+        bookingDate: booking?.bookingDate || (defaultDate ? format(defaultDate, "yyyy-MM-dd") : ""),
+        fromTime: booking?.fromTime || "09:00",
+        toTime: booking?.toTime || "18:00",
+        actualFromTime: booking?.actualFromTime || "",
+        actualToTime: booking?.actualToTime || "",
+        breakHours: booking?.breakHours?.toString() || "0",
+        status: (booking?.status as any) || "planning",
+        notes: booking?.notes || "",
+      });
+    }
+  }, [open, booking, defaultDate, form]);
+
   // Watch for conflict-related fields
   const watchedRoomId = form.watch("roomId");
   const watchedEditorId = form.watch("editorId");
@@ -144,7 +165,8 @@ export function BookingForm({ open, onOpenChange, booking, defaultDate }: Bookin
         toTime: watchedToTime,
         excludeBookingId: booking?.id,
       });
-      setConflictResult(response as ConflictResult);
+      const result = await response.json();
+      setConflictResult(result as ConflictResult);
     } catch (error) {
       console.error("Error checking conflicts:", error);
     } finally {

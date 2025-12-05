@@ -100,10 +100,16 @@ export function UserProfileModal({ open, onOpenChange }: UserProfileModalProps) 
 
   const updateProfileMutation = useMutation({
     mutationFn: async (data: ProfileForm) => {
-      return apiRequest("PATCH", `/api/users/${user?.id}/profile`, data);
+      const response = await apiRequest("PATCH", `/api/users/${user?.id}/profile`, data);
+      return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/users", user?.id, "profile"] });
+      profileForm.reset({
+        fullName: data.fullName || "",
+        email: data.email || "",
+        mobile: data.mobile || "",
+      });
       toast({ title: "Profile updated successfully" });
     },
     onError: (error: any) => {

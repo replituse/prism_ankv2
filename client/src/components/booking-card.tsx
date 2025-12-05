@@ -24,6 +24,13 @@ interface BookingCardProps {
   compact?: boolean;
 }
 
+// Helper to truncate long names
+function truncateName(name: string, maxLength: number = 15): string {
+  if (!name) return "Unknown";
+  if (name.length <= maxLength) return name;
+  return name.slice(0, maxLength) + "...";
+}
+
 export function BookingCard({
   booking,
   onEdit,
@@ -46,6 +53,7 @@ export function BookingCard({
   };
 
   const isEditable = booking.status !== "cancelled";
+  const customerName = booking.customer?.name || "Unknown Customer";
 
   return (
     <Tooltip>
@@ -65,30 +73,35 @@ export function BookingCard({
             </div>
           )}
           <div className="flex items-start justify-between gap-1">
-            <div className="flex-1 min-w-0">
-              <p className={cn("text-sm font-medium truncate", !isEditable && "line-through text-muted-foreground")}>
-                {booking.customer?.name || "Unknown Customer"}
+            <div className="flex-1 min-w-0 overflow-hidden">
+              <p 
+                className={cn("text-sm font-medium", !isEditable && "line-through text-muted-foreground")}
+                title={customerName}
+              >
+                {truncateName(customerName)}
               </p>
               {!compact && (
-                <p className="text-xs text-muted-foreground truncate">
-                  {booking.project?.name}
+                <p className="text-xs text-muted-foreground truncate" title={booking.project?.name}>
+                  {truncateName(booking.project?.name || "", 18)}
                 </p>
               )}
             </div>
             
-            {isEditable && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-6 w-6 shrink-0"
-                    onClick={(e) => e.stopPropagation()}
-                    data-testid={`booking-menu-${booking.id}`}
-                  >
-                    <MoreVertical className="h-3 w-3" />
-                  </Button>
-                </DropdownMenuTrigger>
+            {/* Always show 3-dot menu - never hidden */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 shrink-0 flex-shrink-0"
+                  onClick={(e) => e.stopPropagation()}
+                  data-testid={`booking-menu-${booking.id}`}
+                  disabled={!isEditable}
+                >
+                  <MoreVertical className="h-3 w-3" />
+                </Button>
+              </DropdownMenuTrigger>
+              {isEditable && (
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem 
                     onClick={(e) => {
@@ -122,8 +135,8 @@ export function BookingCard({
                     Cancel Booking
                   </DropdownMenuItem>
                 </DropdownMenuContent>
-              </DropdownMenu>
-            )}
+              )}
+            </DropdownMenu>
           </div>
 
           <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
