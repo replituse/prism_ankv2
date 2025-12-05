@@ -96,7 +96,7 @@ async function seedDemoData() {
   }
   console.log(`Created ${createdProjects.length} projects`);
 
-  // Create Demo Rooms (8)
+  // Create Demo Rooms (10)
   const roomData = [
     { name: "Sound Stage A", roomType: "sound" as const, capacity: 4 },
     { name: "Sound Stage B", roomType: "sound" as const, capacity: 3 },
@@ -106,6 +106,8 @@ async function seedDemoData() {
     { name: "Editing Suite 1", roomType: "editing" as const, capacity: 2 },
     { name: "Editing Suite 2", roomType: "editing" as const, capacity: 2 },
     { name: "Client Lounge", roomType: "client_office" as const, capacity: 10 },
+    { name: "Dubbing Studio 1", roomType: "dubbing" as const, capacity: 3 },
+    { name: "Mixing Room A", roomType: "mixing" as const, capacity: 4 },
   ];
 
   const createdRooms: any[] = [];
@@ -179,13 +181,18 @@ async function seedDemoData() {
   }
   console.log(`Created ${bookingData.length} bookings for December 2025`);
 
-  // Create Demo Editor Leaves (for conflict testing)
+  // Create Demo Editor Leaves (for conflict testing) - 10 entries
   const leaveData = [
     { editorId: createdEditors[0].id, fromDate: "2025-12-25", toDate: "2025-12-25", reason: "Christmas Holiday" },
     { editorId: createdEditors[1].id, fromDate: "2025-12-26", toDate: "2025-12-27", reason: "Personal Leave" },
     { editorId: createdEditors[2].id, fromDate: "2025-12-31", toDate: "2025-12-31", reason: "New Year Eve" },
     { editorId: createdEditors[3].id, fromDate: "2025-12-24", toDate: "2025-12-24", reason: "Festival Leave" },
     { editorId: createdEditors[4].id, fromDate: "2025-12-17", toDate: "2025-12-17", reason: "Medical Appointment" },
+    { editorId: createdEditors[5].id, fromDate: "2025-12-28", toDate: "2025-12-29", reason: "Family Function" },
+    { editorId: createdEditors[6].id, fromDate: "2025-12-23", toDate: "2025-12-23", reason: "Sick Leave" },
+    { editorId: createdEditors[7].id, fromDate: "2025-12-16", toDate: "2025-12-16", reason: "Personal Work" },
+    { editorId: createdEditors[8].id, fromDate: "2025-12-30", toDate: "2025-12-30", reason: "Wedding Leave" },
+    { editorId: createdEditors[9].id, fromDate: "2025-12-22", toDate: "2025-12-22", reason: "Emergency Leave" },
   ];
 
   for (const leave of leaveData) {
@@ -200,8 +207,7 @@ async function seedDemoData() {
       customerId: createdCustomers[0].id,
       projectId: createdProjects[0].id,
       chalanDate: "2025-12-01",
-      totalAmount: "150000",
-      status: "confirmed",
+      totalAmount: 150000,
       notes: "Post production work completed"
     },
     { 
@@ -209,8 +215,7 @@ async function seedDemoData() {
       customerId: createdCustomers[1].id,
       projectId: createdProjects[1].id,
       chalanDate: "2025-12-03",
-      totalAmount: "250000",
-      status: "confirmed",
+      totalAmount: 250000,
       notes: "VFX work Phase 1"
     },
     { 
@@ -218,8 +223,7 @@ async function seedDemoData() {
       customerId: createdCustomers[2].id,
       projectId: createdProjects[2].id,
       chalanDate: "2025-12-05",
-      totalAmount: "180000",
-      status: "pending",
+      totalAmount: 180000,
       notes: "Sound mixing and editing"
     },
     { 
@@ -227,8 +231,7 @@ async function seedDemoData() {
       customerId: createdCustomers[4].id,
       projectId: createdProjects[4].id,
       chalanDate: "2025-12-10",
-      totalAmount: "320000",
-      status: "confirmed",
+      totalAmount: 320000,
       notes: "Complete post production"
     },
     { 
@@ -236,9 +239,48 @@ async function seedDemoData() {
       customerId: createdCustomers[5].id,
       projectId: createdProjects[5].id,
       chalanDate: "2025-12-12",
-      totalAmount: "420000",
-      status: "draft",
+      totalAmount: 420000,
       notes: "VFX and DI work"
+    },
+    { 
+      chalanNumber: "CH-2025-006",
+      customerId: createdCustomers[6].id,
+      projectId: createdProjects[6].id,
+      chalanDate: "2025-12-14",
+      totalAmount: 550000,
+      notes: "Complete audio post production"
+    },
+    { 
+      chalanNumber: "CH-2025-007",
+      customerId: createdCustomers[7].id,
+      projectId: createdProjects[7].id,
+      chalanDate: "2025-12-16",
+      totalAmount: 380000,
+      notes: "DI and color grading"
+    },
+    { 
+      chalanNumber: "CH-2025-008",
+      customerId: createdCustomers[8].id,
+      projectId: createdProjects[8].id,
+      chalanDate: "2025-12-18",
+      totalAmount: 290000,
+      notes: "Sound design and mixing"
+    },
+    { 
+      chalanNumber: "CH-2025-009",
+      customerId: createdCustomers[9].id,
+      projectId: createdProjects[9].id,
+      chalanDate: "2025-12-20",
+      totalAmount: 175000,
+      notes: "Teaser editing and VFX"
+    },
+    { 
+      chalanNumber: "CH-2025-010",
+      customerId: createdCustomers[3].id,
+      projectId: createdProjects[3].id,
+      chalanDate: "2025-12-22",
+      totalAmount: 620000,
+      notes: "Full post production package"
     },
   ];
 
@@ -249,16 +291,23 @@ async function seedDemoData() {
     await db.insert(chalanItems).values({
       chalanId: created.id,
       description: "Editing Hours",
-      quantity: "40",
-      rate: "2500",
-      amount: "100000",
+      quantity: 40,
+      rate: 2500,
+      amount: 100000,
     });
     await db.insert(chalanItems).values({
       chalanId: created.id,
       description: "Sound Mixing",
-      quantity: "10",
-      rate: "5000",
-      amount: "50000",
+      quantity: 10,
+      rate: 5000,
+      amount: 50000,
+    });
+    await db.insert(chalanItems).values({
+      chalanId: created.id,
+      description: "VFX Work",
+      quantity: 20,
+      rate: 3000,
+      amount: 60000,
     });
   }
   console.log(`Created ${chalanData.length} chalans with items`);
@@ -277,11 +326,11 @@ async function seedDemoData() {
   console.log("\n=== Demo Data Summary ===");
   console.log("Customers: 10");
   console.log("Projects: 15");
-  console.log("Rooms: 8");
+  console.log("Rooms: 10");
   console.log("Editors: 10");
   console.log("Bookings: 15 (December 2025)");
-  console.log("Leaves: 5");
-  console.log("Chalans: 5");
+  console.log("Leaves: 10");
+  console.log("Chalans: 10");
   console.log("========================\n");
 
   console.log("Demo data seeding complete!");
