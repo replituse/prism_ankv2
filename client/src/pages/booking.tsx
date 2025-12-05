@@ -338,12 +338,13 @@ export default function BookingPage() {
           </div>
         </div>
 
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-auto" style={{ position: 'relative' }}>
           <div className="grid grid-cols-7 gap-px bg-border rounded-lg overflow-hidden min-h-full">
             {WEEKDAYS.map((day) => (
               <div
                 key={day}
-                className="bg-muted p-2 text-center text-sm font-medium sticky top-0 z-10"
+                className="bg-muted p-2 text-center text-sm font-medium sticky top-0 z-20"
+                style={{ position: 'sticky', top: 0 }}
               >
                 {day}
               </div>

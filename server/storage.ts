@@ -490,6 +490,22 @@ export class DatabaseStorage implements IStorage {
   }
 
   async cancelBooking(id: number, reason: string, userId?: number): Promise<Booking | undefined> {
+    const [existing] = await db.select().from(bookings).where(eq(bookings.id, id)).limit(1);
+    
+    if (!existing) {
+      return undefined;
+    }
+    
+    if (existing.status === "cancelled") {
+      throw new Error("Booking is already cancelled");
+    }
+    
+    const todayString = new Date().toISOString().split('T')[0];
+    
+    if (existing.bookingDate < todayString) {
+      throw new Error("Cannot cancel past bookings. Only current date and future bookings can be cancelled.");
+    }
+    
     const [updated] = await db
       .update(bookings)
       .set({

@@ -1,0 +1,259 @@
+Project: PRISM – Post-Production Management System
+Strict Instructions:
+
+❌ Do NOT break existing booking, chalan, reports, conflict, or dashboard logic
+
+❌ Do NOT change database structure unless absolutely required
+
+✅ Only apply UI improvements, workflow additions & demo data as listed
+
+✅ Keep dashboard layout same (only add sticky behavior where asked)
+
+✅ Keep existing authentication system
+
+✅ 1. SIDEBAR MAIN HEADING TEXT – SIZE, ALIGNMENT & BACKGROUND COLOR
+❌ Current Issue:
+
+Sidebar headings (Operations, Masters, Reports, Utility) are:
+
+Too big
+
+Not aligned properly
+
+No background grouping color
+
+✅ Required Fix:
+
+✅ Make sidebar main headings text size slightly smaller & normal
+✅ Shift text slightly left for proper alignment
+✅ Add a lightened blue background behind each main heading block
+✅ The background should:
+
+Match PRISM light blue theme
+
+Be slightly darker than page background
+
+Soft rounded corners
+
+✅ Example groups:
+
+Operations
+
+Masters
+
+Reports
+
+Utility
+
+✅ 2. SIDEBAR HEADING CLICK → SMOOTH ANIMATED OPEN/CLOSE
+✅ Required Behavior:
+
+✅ When clicking any sidebar heading:
+
+✅ Child items open with smooth slide-down animation
+
+✅ Close with smooth slide-up animation
+
+✅ Add subtle fade-in effect
+
+✅ Rotate arrow icon smoothly (if exists)
+
+✅ Transition must look:
+
+Clean
+
+Premium
+
+Attractive
+
+Not jumpy
+
+✅ 3. ADD “CANCEL” STATUS IN BOOKING FORM (FUTURE BOOKINGS ONLY)
+✅ Required Enhancement:
+
+✅ Add a new Booking Status option:
+
+Cancelled
+
+
+✅ Rules:
+
+✅ Booking can be cancelled only for current date & future dates
+
+❌ Past bookings cannot be cancelled
+
+✅ On Cancel:
+
+Ask for Cancel Reason
+
+Lock further editing
+
+Show visual strike-through in calendar
+
+Mark as Cancelled in:
+
+Booking Report
+
+Conflict Report
+
+Dashboard
+
+✅ Cancelled bookings must NOT be billed or chalan-generated
+
+✅ 4. COMPANY SELECTION LOGIN + TEST USERS
+
+✅ Add Company Selection Option at Login (mandatory)
+
+✅ Add these demo login credentials for testing:
+
+✅ For PRISM:
+Username: admin
+PIN: 1234
+Company: PRISM
+
+✅ For Airavata Studio:
+Username: airavata_admin
+PIN: 1234
+Company: Airavata Studio
+
+
+✅ Validation rules:
+
+Username + PIN + Company must match
+
+Wrong company → Login must fail
+
+Each company must see only their own data
+
+✅ 5. ADD COMPLETE DEMO DATA IN ALL MODULES + 2 CONFLICT RECORDS
+
+✅ Insert realistic demo data into:
+
+✅ Masters:
+
+Customers
+
+Projects
+
+Rooms
+
+Editors
+
+Users
+
+✅ Operations:
+
+Bookings
+
+Leaves
+
+Chalan Entries
+
+✅ Reports:
+
+Booking Report
+
+Editor Report
+
+Chalan Report
+
+Conflict Report
+
+✅ Demo Data Rules:
+
+✅ Every day must have 1–2–3 records
+✅ Data must be added with:
+
+1–2 day gap pattern
+
+
+✅ Include:
+
+Normal bookings
+
+Cancelled bookings
+
+Completed bookings
+
+Chalan-generated bookings
+
+✅ At least 2 proper Conflict Records
+
+One Room conflict
+
+One Editor conflict
+
+✅ Demo data must:
+
+Appear correctly in:
+
+Calendar
+
+All reports
+
+Conflict report
+
+Chalan report
+
+Be filterable by:
+
+Date
+
+Customer
+
+Editor
+
+Status
+
+✅ 6. DASHBOARD – STICKY MONTH DAY ROW ON SCROLL
+❌ Current Issue:
+
+When scrolling dashboard, the top day row disappears
+
+✅ Required Fix:
+
+✅ When user scrolls down in dashboard:
+
+✅ The top days of month row (Sun–Sat with dates) must stay:
+
+STICKY at the TOP
+
+
+✅ Behavior:
+
+Smooth sticky effect
+
+No shaking on scroll
+
+No overlap with header
+
+Always visible for quick reference
+
+✅ 7. FINAL UI & FLOW VALIDATION
+
+After implementation, ensure:
+
+✅ Sidebar headings look:
+
+Smaller
+
+Properly aligned
+
+Light blue grouped background
+
+✅ Sidebar open/close animation is smooth
+✅ Booking Cancel status works correctly
+✅ Company login with PRISM & Airavata works
+✅ Demo data appears everywhere
+✅ Conflict data appears in Conflict Report
+✅ Dashboard top date row sticks while scrolling
+
+✅ FINAL ACCEPTANCE CHECKLIST
+
+✅ Sidebar heading text resized & recolored
+✅ Sidebar open animation looks premium
+✅ Booking Cancel status added with rules
+✅ Company-based login works with demo users
+✅ Full demo data across all modules
+✅ 2 conflict records visible
+✅ Dashboard sticky day row works

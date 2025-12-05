@@ -8,7 +8,6 @@ import {
   UserCircle,
   FileText,
   ClipboardList,
-  BarChart3,
   Settings,
   LogOut,
   ChevronDown,
@@ -41,6 +40,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/lib/auth-context";
 import { UserProfileModal } from "@/components/user-profile-modal";
+import { cn } from "@/lib/utils";
 
 const operationsItems = [
   { title: "Booking", url: "/", icon: Calendar },
@@ -78,17 +78,31 @@ function SidebarNavGroup({
   defaultOpen?: boolean;
 }) {
   const [location] = useLocation();
+  const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
-    <Collapsible defaultOpen={defaultOpen} className="group/collapsible">
-      <SidebarGroup>
-        <SidebarGroupLabel asChild className="h-auto py-2 px-3 mb-1 bg-sky-100 dark:bg-sky-900/30 rounded-md mx-2">
+    <Collapsible 
+      defaultOpen={defaultOpen} 
+      open={isOpen}
+      onOpenChange={setIsOpen}
+      className="group/collapsible"
+    >
+      <SidebarGroup className="py-1">
+        <SidebarGroupLabel 
+          asChild 
+          className="h-auto py-1.5 px-2.5 mb-1 sidebar-group-label rounded-md mx-2 cursor-pointer"
+        >
           <CollapsibleTrigger className="flex w-full items-center gap-2">
-            <span className="text-base font-bold text-gray-900 dark:text-gray-100">{label}</span>
-            <ChevronDown className="ml-auto h-4 w-4 text-gray-700 dark:text-gray-300 transition-transform group-data-[state=open]/collapsible:rotate-180" />
+            <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">{label}</span>
+            <ChevronDown 
+              className={cn(
+                "ml-auto h-3.5 w-3.5 text-gray-500 dark:text-gray-400 sidebar-arrow",
+                isOpen && "sidebar-arrow-open"
+              )} 
+            />
           </CollapsibleTrigger>
         </SidebarGroupLabel>
-        <CollapsibleContent>
+        <CollapsibleContent className="sidebar-collapsible-content">
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
