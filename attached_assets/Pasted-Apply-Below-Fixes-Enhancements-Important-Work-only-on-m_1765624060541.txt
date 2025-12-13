@@ -1,0 +1,218 @@
+Apply Below Fixes & Enhancements
+
+Important:
+Work only on my existing project.
+Do NOT change major functionality, structure, database schema, or overall design.
+Only fix, align, and enhance features exactly as mentioned.
+
+1️⃣ Chalan Report – Fix Amount / Rs. Text Overlap
+
+Issue seen in Chalan Report (uploaded image):
+
+Required Fix:
+
+Fix overlapping amount text (Rs. values overflowing or merging).
+
+Ensure:
+
+Rs. and amount are displayed cleanly and readable.
+
+Text does not overflow outside the column.
+
+Amount column width adjusts properly.
+
+Use proper number formatting (example: Rs. 25,000.00).
+
+Keep column layout intact; do not expand filter section width.
+
+2️⃣ UI Color Consistency Across Project
+
+Make UI color consistent across entire project.
+
+Required:
+
+Use same background color for:
+
+Operation / Master / Reports / Utility sidebar buttons
+
+Schedule Booking button
+
+New Booking button
+
+Header PRISM background
+
+All buttons across project should follow same theme color.
+
+No redesign — only color alignment.
+
+3️⃣ Chalan Revise – Proper Flow & Unique Chalan ID
+
+Fix and standardize Chalan Revise functionality.
+
+Requirements:
+
+Chalan Entry & Chalan Revise must:
+
+Follow same unique Chalan ID logic
+
+Format: CHYYMM-XX
+
+Example: CH2502-01, CH2502-02
+
+YY = Year, MM = Month, XX = monthly sequence
+
+Chalan Revise flow:
+
+Open revise in new full screen, not popup
+
+Load existing chalan details correctly
+
+Save revised data under same Chalan ID
+
+Maintain revision history internally
+
+Ensure proper backend logic, no duplicate IDs.
+
+4️⃣ Conflict Report – Proper Resolve & Data Sync
+
+Improve conflict resolution logic.
+
+Keep This Button:
+
+Accept selected booking
+
+Automatically cancel or mark conflicting bookings
+
+Remove resolved conflict from conflict report
+
+Update Button:
+
+Open booking edit screen
+
+Allow changing:
+
+Time
+
+Room
+
+Editor
+
+After update:
+
+Conflict should be resolved
+
+Record removed from conflict report
+
+Updated data must reflect correctly in:
+
+Booking
+
+Dashboard
+
+Chalan
+
+Reports
+
+5️⃣ Remove Activity History from Utility
+
+Completely remove/delete Activity History section from Utility module.
+
+No UI entry, no menu item, no routing.
+
+Do not affect other modules.
+
+6️⃣ Unified History Button with Date Filter
+
+Implement one consistent History feature.
+
+Requirements:
+
+Add History button (similar to Leaves Entry) in:
+
+Chalan Entry
+
+Chalan Revise
+
+Master modules
+
+History view must:
+
+Open in full screen or modal (as existing pattern)
+
+Include Date filter
+
+Show:
+
+Who edited
+
+What changed
+
+Date & time
+
+Use same history logic, no duplication.
+
+UI must be clean and readable.
+
+7️⃣ User Rights – Strict View-Only Access Fix
+
+Fix user permission enforcement.
+
+Required Behavior:
+
+If admin gives a user:
+
+Booking → View only
+
+Chalan Entry → View only
+
+Then user must:
+
+See only Booking & Chalan modules
+
+Be able to view only
+
+NOT be able to:
+
+Edit
+
+Delete
+
+Cancel
+
+Revise
+
+Create
+
+Enforce permissions on:
+
+UI level (buttons hidden/disabled)
+
+Backend level (API protection)
+
+Ensure permissions work correctly for all roles.
+
+⚠️ Important Notes
+
+Do NOT change DB structure unless unavoidable.
+
+Do NOT redesign UI — only fixes & alignment.
+
+Do NOT break existing workflow.
+
+Follow current coding patterns.
+
+✅ Expected Result
+
+Chalan report amount display fixed
+
+Unified project color theme
+
+Proper chalan revise flow with unique ID
+
+Conflict resolution works end-to-end
+
+Utility history removed
+
+Clean, filtered history across modules
+
+Strict, reliable role-based access

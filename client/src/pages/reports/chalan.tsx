@@ -86,7 +86,7 @@ export default function ChalanReportPage() {
     navigate(`/chalan?edit=${chalan.id}`);
   };
 
-  const totalAmount = filteredChalans.reduce((sum, c) => sum + (c.totalAmount || 0), 0);
+  const totalAmount = filteredChalans.reduce((sum, c) => sum + Number(c.totalAmount || 0), 0);
   const cancelledCount = chalans.filter((c) => c.isCancelled).length;
 
   const columns: Column<ChalanWithItems>[] = [
@@ -121,8 +121,8 @@ export default function ChalanReportPage() {
       key: "totalAmount",
       header: "Amount",
       cell: (row) => (
-        <span className="font-mono font-medium">
-          Rs. {(row.totalAmount || 0).toLocaleString()}
+        <span className="font-mono font-medium whitespace-nowrap">
+          Rs. {(row.totalAmount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
         </span>
       ),
     },
@@ -230,12 +230,12 @@ export default function ChalanReportPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-booking-confirmed/10 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-lg bg-booking-confirmed/10 flex items-center justify-center shrink-0">
                     <FileSpreadsheet className="h-5 w-5 text-booking-confirmed" />
                   </div>
-                  <div>
-                    <p className="text-xl font-bold font-mono">
-                      Rs. {totalAmount.toLocaleString()}
+                  <div className="min-w-0 flex-1">
+                    <p className="text-lg font-bold font-mono truncate" title={`Rs. ${totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}>
+                      Rs. {totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </p>
                     <p className="text-xs text-muted-foreground">Total Amount</p>
                   </div>

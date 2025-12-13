@@ -17,7 +17,6 @@ import {
   FileSpreadsheet,
   UserCog,
   Shield,
-  History,
 } from "lucide-react";
 import {
   Sidebar,
@@ -92,7 +91,6 @@ const reportsItems: MenuItem[] = [
 const utilityItems: MenuItem[] = [
   { title: "User Rights", url: "/utility/user-rights", icon: Shield },
   { title: "User Management", url: "/utility/users", icon: Settings },
-  { title: "Activity History", url: "/history", icon: History },
 ];
 
 const menuSections: MenuSection[] = [
