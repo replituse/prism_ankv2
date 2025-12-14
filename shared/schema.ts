@@ -1,42 +1,42 @@
 import { sql, relations } from "drizzle-orm";
-import { pgTable, text, varchar, integer, timestamp, boolean, time, date, pgEnum } from "drizzle-orm/pg-core";
+import { mysqlTable, text, varchar, int, timestamp, boolean, time, date, mysqlEnum } from "drizzle-orm/mysql-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 // Enums
-export const userRoleEnum = pgEnum("user_role", ["admin", "gst", "non_gst"]);
-export const projectTypeEnum = pgEnum("project_type", ["movie", "serial", "web_series", "ad", "teaser", "trilogy"]);
-export const roomTypeEnum = pgEnum("room_type", ["sound", "music", "vfx", "client_office", "editing", "dubbing", "mixing"]);
-export const editorTypeEnum = pgEnum("editor_type", ["video", "audio", "vfx", "colorist", "di"]);
-export const bookingStatusEnum = pgEnum("booking_status", ["planning", "tentative", "confirmed", "cancelled"]);
+export const userRoleEnum = mysqlEnum("user_role", ["admin", "gst", "non_gst"]);
+export const projectTypeEnum = mysqlEnum("project_type", ["movie", "serial", "web_series", "ad", "teaser", "trilogy"]);
+export const roomTypeEnum = mysqlEnum("room_type", ["sound", "music", "vfx", "client_office", "editing", "dubbing", "mixing"]);
+export const editorTypeEnum = mysqlEnum("editor_type", ["video", "audio", "vfx", "colorist", "di"]);
+export const bookingStatusEnum = mysqlEnum("booking_status", ["planning", "tentative", "confirmed", "cancelled"]);
 
 // Companies
-export const companies = pgTable("companies", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+export const companies = mysqlTable("companies", {
+  id: int("id").primaryKey().autoincrement(),
   name: text("name").notNull(),
   address: text("address"),
   gstNumber: text("gst_number"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
 
 // Users
-export const users = pgTable("users", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-  username: text("username").notNull().unique(),
+export const users = mysqlTable("users", {
+  id: int("id").primaryKey().autoincrement(),
+  username: text("username").notNull(),
   password: text("password").notNull(),
   securityPin: text("security_pin").notNull(),
-  role: userRoleEnum("role").notNull().default("non_gst"),
-  companyId: integer("company_id").references(() => companies.id),
+  role: mysqlEnum("role", ["admin", "gst", "non_gst"]).notNull().default("non_gst"),
+  companyId: int("company_id").references(() => companies.id),
   fullName: text("full_name"),
   email: text("email"),
   mobile: text("mobile"),
   isActive: boolean("is_active").notNull().default(true),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
 
 // Customers
-export const customers = pgTable("customers", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+export const customers = mysqlTable("customers", {
+  id: int("id").primaryKey().autoincrement(),
   name: text("name").notNull(),
   companyName: text("company_name"),
   address: text("address"),
@@ -44,20 +44,20 @@ export const customers = pgTable("customers", {
   email: text("email"),
   gstNumber: text("gst_number"),
   isActive: boolean("is_active").notNull().default(true),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
 
 // Designations Master
-export const designations = pgTable("designations", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-  name: text("name").notNull().unique(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
+export const designations = mysqlTable("designations", {
+  id: int("id").primaryKey().autoincrement(),
+  name: text("name").notNull(),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
 
 // Customer Contacts (multiple per customer)
-export const customerContacts = pgTable("customer_contacts", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-  customerId: integer("customer_id").references(() => customers.id).notNull(),
+export const customerContacts = mysqlTable("customer_contacts", {
+  id: int("id").primaryKey().autoincrement(),
+  customerId: int("customer_id").references(() => customers.id).notNull(),
   name: text("name").notNull(),
   phone: text("phone"),
   email: text("email"),
@@ -66,105 +66,105 @@ export const customerContacts = pgTable("customer_contacts", {
 });
 
 // Projects
-export const projects = pgTable("projects", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+export const projects = mysqlTable("projects", {
+  id: int("id").primaryKey().autoincrement(),
   name: text("name").notNull(),
-  customerId: integer("customer_id").references(() => customers.id).notNull(),
-  projectType: projectTypeEnum("project_type").notNull(),
+  customerId: int("customer_id").references(() => customers.id).notNull(),
+  projectType: mysqlEnum("project_type", ["movie", "serial", "web_series", "ad", "teaser", "trilogy"]).notNull(),
   description: text("description"),
   hasChalanCreated: boolean("has_chalan_created").notNull().default(false),
   hasInvoiceCreated: boolean("has_invoice_created").notNull().default(false),
   isActive: boolean("is_active").notNull().default(true),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
 
 // Rooms
-export const rooms = pgTable("rooms", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+export const rooms = mysqlTable("rooms", {
+  id: int("id").primaryKey().autoincrement(),
   name: text("name").notNull(),
-  roomType: roomTypeEnum("room_type").notNull(),
-  capacity: integer("capacity").default(1),
+  roomType: mysqlEnum("room_type", ["sound", "music", "vfx", "client_office", "editing", "dubbing", "mixing"]).notNull(),
+  capacity: int("capacity").default(1),
   ignoreConflict: boolean("ignore_conflict").notNull().default(false),
   isActive: boolean("is_active").notNull().default(true),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
 
 // Editors
-export const editors = pgTable("editors", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+export const editors = mysqlTable("editors", {
+  id: int("id").primaryKey().autoincrement(),
   name: text("name").notNull(),
-  editorType: editorTypeEnum("editor_type").notNull(),
+  editorType: mysqlEnum("editor_type", ["video", "audio", "vfx", "colorist", "di"]).notNull(),
   phone: text("phone"),
   email: text("email"),
   joinDate: date("join_date"),
   leaveDate: date("leave_date"),
   isActive: boolean("is_active").notNull().default(true),
   ignoreConflict: boolean("ignore_conflict").notNull().default(false),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
 
 // Bookings
-export const bookings = pgTable("bookings", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-  roomId: integer("room_id").references(() => rooms.id).notNull(),
-  customerId: integer("customer_id").references(() => customers.id).notNull(),
-  projectId: integer("project_id").references(() => projects.id).notNull(),
-  contactId: integer("contact_id").references(() => customerContacts.id),
-  editorId: integer("editor_id").references(() => editors.id),
+export const bookings = mysqlTable("bookings", {
+  id: int("id").primaryKey().autoincrement(),
+  roomId: int("room_id").references(() => rooms.id).notNull(),
+  customerId: int("customer_id").references(() => customers.id).notNull(),
+  projectId: int("project_id").references(() => projects.id).notNull(),
+  contactId: int("contact_id").references(() => customerContacts.id),
+  editorId: int("editor_id").references(() => editors.id),
   bookingDate: date("booking_date").notNull(),
   fromTime: time("from_time").notNull(),
   toTime: time("to_time").notNull(),
   actualFromTime: time("actual_from_time"),
   actualToTime: time("actual_to_time"),
-  breakHours: integer("break_hours").default(0),
-  totalHours: integer("total_hours"),
-  status: bookingStatusEnum("status").notNull().default("planning"),
+  breakHours: int("break_hours").default(0),
+  totalHours: int("total_hours"),
+  status: mysqlEnum("status", ["planning", "tentative", "confirmed", "cancelled"]).notNull().default("planning"),
   cancelReason: text("cancel_reason"),
   cancelledAt: timestamp("cancelled_at"),
   notes: text("notes"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+  updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
 
 // Booking Logs (audit trail)
-export const bookingLogs = pgTable("booking_logs", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-  bookingId: integer("booking_id").references(() => bookings.id).notNull(),
-  userId: integer("user_id").references(() => users.id),
+export const bookingLogs = mysqlTable("booking_logs", {
+  id: int("id").primaryKey().autoincrement(),
+  bookingId: int("booking_id").references(() => bookings.id).notNull(),
+  userId: int("user_id").references(() => users.id),
   action: text("action").notNull(),
   changes: text("changes"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
 
 // Editor Leaves
-export const editorLeaves = pgTable("editor_leaves", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-  editorId: integer("editor_id").references(() => editors.id).notNull(),
+export const editorLeaves = mysqlTable("editor_leaves", {
+  id: int("id").primaryKey().autoincrement(),
+  editorId: int("editor_id").references(() => editors.id).notNull(),
   fromDate: date("from_date").notNull(),
   toDate: date("to_date").notNull(),
   reason: text("reason"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
 
 // Chalans
-export const chalans = pgTable("chalans", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-  chalanNumber: text("chalan_number").notNull().unique(),
-  customerId: integer("customer_id").references(() => customers.id).notNull(),
-  projectId: integer("project_id").references(() => projects.id).notNull(),
-  bookingId: integer("booking_id").references(() => bookings.id).unique(),
+export const chalans = mysqlTable("chalans", {
+  id: int("id").primaryKey().autoincrement(),
+  chalanNumber: text("chalan_number").notNull(),
+  customerId: int("customer_id").references(() => customers.id).notNull(),
+  projectId: int("project_id").references(() => projects.id).notNull(),
+  bookingId: int("booking_id").references(() => bookings.id),
   chalanDate: date("chalan_date").notNull(),
   totalAmount: text("total_amount").default("0"),
   isCancelled: boolean("is_cancelled").notNull().default(false),
   cancelReason: text("cancel_reason"),
   notes: text("notes"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
 
 // Chalan Items
-export const chalanItems = pgTable("chalan_items", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-  chalanId: integer("chalan_id").references(() => chalans.id).notNull(),
+export const chalanItems = mysqlTable("chalan_items", {
+  id: int("id").primaryKey().autoincrement(),
+  chalanId: int("chalan_id").references(() => chalans.id).notNull(),
   description: text("description").notNull(),
   quantity: text("quantity").default("1"),
   rate: text("rate").default("0"),
@@ -172,19 +172,19 @@ export const chalanItems = pgTable("chalan_items", {
 });
 
 // Chalan Revisions
-export const chalanRevisions = pgTable("chalan_revisions", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-  chalanId: integer("chalan_id").references(() => chalans.id).notNull(),
-  revisionNumber: integer("revision_number").notNull(),
+export const chalanRevisions = mysqlTable("chalan_revisions", {
+  id: int("id").primaryKey().autoincrement(),
+  chalanId: int("chalan_id").references(() => chalans.id).notNull(),
+  revisionNumber: int("revision_number").notNull(),
   changes: text("changes"),
-  revisedBy: integer("revised_by").references(() => users.id),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
+  revisedBy: int("revised_by").references(() => users.id),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
 
 // User Module Access
-export const userModuleAccess = pgTable("user_module_access", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-  userId: integer("user_id").references(() => users.id).notNull(),
+export const userModuleAccess = mysqlTable("user_module_access", {
+  id: int("id").primaryKey().autoincrement(),
+  userId: int("user_id").references(() => users.id).notNull(),
   module: text("module").notNull(),
   section: text("section"),
   canView: boolean("can_view").notNull().default(false),

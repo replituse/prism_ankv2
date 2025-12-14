@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { eq, and, gte, lte, sql, desc, or, inArray, asc } from "drizzle-orm";
+import { eq, and, gte, lte, sql, desc, or, inArray, asc, like } from "drizzle-orm";
 import {
   companies,
   users,
@@ -152,17 +152,20 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createCompany(company: InsertCompany): Promise<Company> {
-    const [created] = await db.insert(companies).values(company).returning();
+    const result = await db.insert(companies).values(company);
+    const insertId = (result as any)[0]?.insertId;
+    const [created] = await db.select().from(companies).where(eq(companies.id, insertId));
     return created;
   }
 
   async updateCompany(id: number, company: Partial<InsertCompany>): Promise<Company | undefined> {
-    const [updated] = await db.update(companies).set(company).where(eq(companies.id, id)).returning();
+    await db.update(companies).set(company).where(eq(companies.id, id));
+    const [updated] = await db.select().from(companies).where(eq(companies.id, id));
     return updated;
   }
 
   async deleteCompany(id: number): Promise<boolean> {
-    const result = await db.delete(companies).where(eq(companies.id, id));
+    await db.delete(companies).where(eq(companies.id, id));
     return true;
   }
 
@@ -198,12 +201,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createUser(user: InsertUser): Promise<User> {
-    const [created] = await db.insert(users).values(user).returning();
+    const result = await db.insert(users).values(user);
+    const insertId = (result as any)[0]?.insertId;
+    const [created] = await db.select().from(users).where(eq(users.id, insertId));
     return created;
   }
 
   async updateUser(id: number, user: Partial<InsertUser>): Promise<User | undefined> {
-    const [updated] = await db.update(users).set(user).where(eq(users.id, id)).returning();
+    await db.update(users).set(user).where(eq(users.id, id));
+    const [updated] = await db.select().from(users).where(eq(users.id, id));
     return updated;
   }
 
@@ -243,7 +249,9 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createCustomer(customer: InsertCustomer, contacts?: InsertCustomerContact[]): Promise<Customer> {
-    const [created] = await db.insert(customers).values(customer).returning();
+    const result = await db.insert(customers).values(customer);
+    const insertId = (result as any)[0]?.insertId;
+    const [created] = await db.select().from(customers).where(eq(customers.id, insertId));
     
     if (contacts && contacts.length > 0) {
       await db.insert(customerContacts).values(
@@ -255,7 +263,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateCustomer(id: number, customer: Partial<InsertCustomer>, contacts?: (InsertCustomerContact & { id?: number })[]): Promise<Customer | undefined> {
-    const [updated] = await db.update(customers).set(customer).where(eq(customers.id, id)).returning();
+    await db.update(customers).set(customer).where(eq(customers.id, id));
+    const [updated] = await db.select().from(customers).where(eq(customers.id, id));
     
     if (contacts !== undefined) {
       const existingContacts = await db.select().from(customerContacts).where(eq(customerContacts.customerId, id));
@@ -329,7 +338,6 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createProject(project: InsertProject): Promise<Project> {
-    // Check for duplicate project name for the same customer
     const existingProjects = await db.select()
       .from(projects)
       .where(and(
@@ -342,13 +350,13 @@ export class DatabaseStorage implements IStorage {
       throw new Error(`A project with the name "${project.name}" already exists for this customer`);
     }
     
-    const [created] = await db.insert(projects).values(project).returning();
+    const result = await db.insert(projects).values(project);
+    const insertId = (result as any)[0]?.insertId;
+    const [created] = await db.select().from(projects).where(eq(projects.id, insertId));
     return created;
   }
 
   async updateProject(id: number, project: Partial<InsertProject>): Promise<Project | undefined> {
-    // Check for conflicts if name, customerId, or isActive is being updated
-    // This includes reactivation scenario where isActive goes from false to true
     const needsConflictCheck = project.name !== undefined || project.customerId !== undefined || project.isActive === true;
     
     if (needsConflictCheck) {
@@ -358,7 +366,6 @@ export class DatabaseStorage implements IStorage {
         const customerIdToCheck = project.customerId ?? existing.customerId;
         const willBeActive = project.isActive ?? existing.isActive;
         
-        // Only check for conflicts if the project will be active after the update
         if (willBeActive) {
           const duplicates = await db.select()
             .from(projects)
@@ -368,7 +375,6 @@ export class DatabaseStorage implements IStorage {
               eq(projects.isActive, true)
             ));
           
-          // Filter out the current project from duplicates
           const conflicting = duplicates.filter(p => p.id !== id);
           if (conflicting.length > 0) {
             throw new Error(`A project with the name "${nameToCheck}" already exists for this customer`);
@@ -377,7 +383,8 @@ export class DatabaseStorage implements IStorage {
       }
     }
     
-    const [updated] = await db.update(projects).set(project).where(eq(projects.id, id)).returning();
+    await db.update(projects).set(project).where(eq(projects.id, id));
+    const [updated] = await db.select().from(projects).where(eq(projects.id, id));
     return updated;
   }
 
@@ -405,12 +412,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createRoom(room: InsertRoom): Promise<Room> {
-    const [created] = await db.insert(rooms).values(room).returning();
+    const result = await db.insert(rooms).values(room);
+    const insertId = (result as any)[0]?.insertId;
+    const [created] = await db.select().from(rooms).where(eq(rooms.id, insertId));
     return created;
   }
 
   async updateRoom(id: number, room: Partial<InsertRoom>): Promise<Room | undefined> {
-    const [updated] = await db.update(rooms).set(room).where(eq(rooms.id, id)).returning();
+    await db.update(rooms).set(room).where(eq(rooms.id, id));
+    const [updated] = await db.select().from(rooms).where(eq(rooms.id, id));
     return updated;
   }
 
@@ -434,12 +444,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createEditor(editor: InsertEditor): Promise<Editor> {
-    const [created] = await db.insert(editors).values(editor).returning();
+    const result = await db.insert(editors).values(editor);
+    const insertId = (result as any)[0]?.insertId;
+    const [created] = await db.select().from(editors).where(eq(editors.id, insertId));
     return created;
   }
 
   async updateEditor(id: number, editor: Partial<InsertEditor>): Promise<Editor | undefined> {
-    const [updated] = await db.update(editors).set(editor).where(eq(editors.id, id)).returning();
+    await db.update(editors).set(editor).where(eq(editors.id, id));
+    const [updated] = await db.select().from(editors).where(eq(editors.id, id));
     return updated;
   }
 
@@ -524,7 +537,6 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createBooking(booking: InsertBooking, userId?: number): Promise<Booking> {
-    // Calculate billing hours before creating
     const totalHours = this.calculateBillingHours(
       booking.fromTime,
       booking.toTime,
@@ -533,10 +545,12 @@ export class DatabaseStorage implements IStorage {
       booking.breakHours || 0
     );
     
-    const [created] = await db.insert(bookings).values({
+    const result = await db.insert(bookings).values({
       ...booking,
       totalHours,
-    }).returning();
+    });
+    const insertId = (result as any)[0]?.insertId;
+    const [created] = await db.select().from(bookings).where(eq(bookings.id, insertId));
     
     await db.insert(bookingLogs).values({
       bookingId: created.id,
@@ -549,25 +563,20 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateBooking(id: number, booking: Partial<InsertBooking>, userId?: number): Promise<Booking | undefined> {
-    // First, fetch existing booking to check status and get current values
     const existingRows = await db.select().from(bookings).where(eq(bookings.id, id)).limit(1);
     
-    // Handle missing booking early
     if (existingRows.length === 0) {
       return undefined;
     }
     
     const existing = existingRows[0];
     
-    // Check if booking is cancelled
     if (existing.status === "cancelled") {
       throw new Error("Cannot update a cancelled booking");
     }
     
-    // Calculate billing hours if any time-related fields are being updated
     let totalHours: number | undefined;
     if (booking.fromTime || booking.toTime || booking.actualFromTime !== undefined || booking.actualToTime !== undefined || booking.breakHours !== undefined) {
-      // Always use persisted times as base, only override with new values
       const fromTime = booking.fromTime || existing.fromTime;
       const toTime = booking.toTime || existing.toTime;
       const actualFromTime = booking.actualFromTime !== undefined ? booking.actualFromTime : existing.actualFromTime;
@@ -583,11 +592,12 @@ export class DatabaseStorage implements IStorage {
       );
     }
     
-    const [updated] = await db
+    await db
       .update(bookings)
       .set({ ...booking, ...(totalHours !== undefined ? { totalHours } : {}), updatedAt: new Date() })
-      .where(eq(bookings.id, id))
-      .returning();
+      .where(eq(bookings.id, id));
+    
+    const [updated] = await db.select().from(bookings).where(eq(bookings.id, id));
     
     if (updated) {
       await db.insert(bookingLogs).values({
@@ -618,7 +628,7 @@ export class DatabaseStorage implements IStorage {
       throw new Error("Cannot cancel past bookings. Only current date and future bookings can be cancelled.");
     }
     
-    const [updated] = await db
+    await db
       .update(bookings)
       .set({
         status: "cancelled",
@@ -626,8 +636,9 @@ export class DatabaseStorage implements IStorage {
         cancelledAt: new Date(),
         updatedAt: new Date(),
       })
-      .where(eq(bookings.id, id))
-      .returning();
+      .where(eq(bookings.id, id));
+    
+    const [updated] = await db.select().from(bookings).where(eq(bookings.id, id));
     
     if (updated) {
       await db.insert(bookingLogs).values({
@@ -654,17 +665,14 @@ export class DatabaseStorage implements IStorage {
     let editorOnLeave = false;
     let leaveInfo = undefined;
 
-    // Get the room to check if it ignores conflicts
     const room = await this.getRoom(booking.roomId);
     const roomIgnoresConflict = room?.ignoreConflict ?? false;
 
-    // Get editor if provided
     let editorIgnoresConflict = false;
     if (booking.editorId) {
       const editor = await this.getEditor(booking.editorId);
       editorIgnoresConflict = editor?.ignoreConflict ?? false;
 
-      // Check if editor is on leave
       const leaves = await db.select().from(editorLeaves).where(eq(editorLeaves.editorId, booking.editorId));
       for (const leave of leaves) {
         if (booking.bookingDate >= leave.fromDate && booking.bookingDate <= leave.toDate) {
@@ -675,26 +683,21 @@ export class DatabaseStorage implements IStorage {
       }
     }
 
-    // Get all bookings for the same date
     const existingBookings = await this.getBookings({ from: booking.bookingDate, to: booking.bookingDate });
     const activeBookings = existingBookings.filter(b => 
       b.status !== "cancelled" && 
       (booking.excludeBookingId ? b.id !== booking.excludeBookingId : true)
     );
 
-    // Check for conflicts
     for (const existing of activeBookings) {
-      // Check time overlap
       const overlaps = booking.fromTime < existing.toTime && existing.fromTime < booking.toTime;
       if (!overlaps) continue;
 
-      // Check room conflict
       const hasRoomConflict = existing.roomId === booking.roomId;
       if (hasRoomConflict && !roomIgnoresConflict && !existing.room?.ignoreConflict) {
         conflicts.push({ type: 'room', booking: existing, message: `Room "${existing.room?.name}" is already booked` });
       }
 
-      // Check editor conflict
       if (booking.editorId && existing.editorId === booking.editorId) {
         if (!editorIgnoresConflict && !existing.editor?.ignoreConflict) {
           conflicts.push({ type: 'editor', booking: existing, message: `Editor "${existing.editor?.name}" is already assigned` });
@@ -711,28 +714,23 @@ export class DatabaseStorage implements IStorage {
   }
 
   calculateBillingHours(fromTime: string, toTime: string, actualFromTime?: string, actualToTime?: string, breakHours?: number): number {
-    // Parse times
     const parseTime = (time: string): number => {
       const [hours, minutes] = time.split(':').map(Number);
       return hours * 60 + minutes;
     };
 
-    // Use actual times if available, otherwise use scheduled times
     const startTime = actualFromTime || fromTime;
     const endTime = actualToTime || toTime;
 
     const startMinutes = parseTime(startTime);
     const endMinutes = parseTime(endTime);
 
-    // Calculate total minutes
     let totalMinutes = endMinutes - startMinutes;
-    if (totalMinutes < 0) totalMinutes += 24 * 60; // Handle overnight bookings
+    if (totalMinutes < 0) totalMinutes += 24 * 60;
 
-    // Subtract break hours (convert to minutes)
     const breakMinutes = (breakHours || 0) * 60;
     totalMinutes -= breakMinutes;
 
-    // Convert to hours (rounded to nearest 0.5)
     const hours = Math.max(0, Math.round(totalMinutes / 30) * 0.5);
     return hours;
   }
@@ -761,12 +759,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createEditorLeave(leave: InsertEditorLeave): Promise<EditorLeave> {
-    const [created] = await db.insert(editorLeaves).values(leave).returning();
+    const result = await db.insert(editorLeaves).values(leave);
+    const insertId = (result as any)[0]?.insertId;
+    const [created] = await db.select().from(editorLeaves).where(eq(editorLeaves.id, insertId));
     return created;
   }
 
   async updateEditorLeave(id: number, leave: Partial<InsertEditorLeave>): Promise<EditorLeave | undefined> {
-    const [updated] = await db.update(editorLeaves).set(leave).where(eq(editorLeaves.id, id)).returning();
+    await db.update(editorLeaves).set(leave).where(eq(editorLeaves.id, id));
+    const [updated] = await db.select().from(editorLeaves).where(eq(editorLeaves.id, id));
     return updated;
   }
 
@@ -840,19 +841,16 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createChalan(chalan: InsertChalan, items: InsertChalanItem[]): Promise<Chalan> {
-    // Generate unique chalan ID in format CHYYMM-XX (e.g., CH2312-01)
     const chalanDate = new Date(chalan.chalanDate);
-    const year = chalanDate.getFullYear().toString().slice(-2); // Last 2 digits of year
-    const month = String(chalanDate.getMonth() + 1).padStart(2, '0'); // 2-digit month
+    const year = chalanDate.getFullYear().toString().slice(-2);
+    const month = String(chalanDate.getMonth() + 1).padStart(2, '0');
     const prefix = `CH${year}${month}-`;
     
-    // Find existing chalans for this month/year to get next sequence number
     const existingChalans = await db
       .select({ chalanNumber: chalans.chalanNumber })
       .from(chalans)
       .where(like(chalans.chalanNumber, `${prefix}%`));
     
-    // Extract sequence numbers and find max
     let maxSeq = 0;
     for (const c of existingChalans) {
       const seqPart = c.chalanNumber?.split('-')[1];
@@ -865,7 +863,6 @@ export class DatabaseStorage implements IStorage {
     const nextSeq = maxSeq + 1;
     const chalanNumber = `${prefix}${String(nextSeq).padStart(2, '0')}`;
     
-    // Ensure totalAmount is stored as string
     const totalAmountStr = typeof chalan.totalAmount === 'number' 
       ? chalan.totalAmount.toString() 
       : (chalan.totalAmount || '0');
@@ -876,7 +873,9 @@ export class DatabaseStorage implements IStorage {
       totalAmount: totalAmountStr,
     };
     
-    const [created] = await db.insert(chalans).values(chalanInsert).returning();
+    const result = await db.insert(chalans).values(chalanInsert);
+    const insertId = (result as any)[0]?.insertId;
+    const [created] = await db.select().from(chalans).where(eq(chalans.id, insertId));
 
     if (items.length > 0) {
       const itemsInsert: (typeof chalanItems.$inferInsert)[] = items.map(item => ({
@@ -895,12 +894,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateChalan(id: number, chalanData: Partial<InsertChalan>, items?: InsertChalanItem[]): Promise<Chalan | undefined> {
-    // Check if chalan is cancelled - cancelled chalans are read-only
     const existing = await this.getChalan(id);
     if (!existing) return undefined;
-    if (existing.isCancelled) return undefined; // Cancelled chalans cannot be updated
+    if (existing.isCancelled) return undefined;
     
-    // Update the chalan basic info (but preserve chalanNumber and createdAt)
     const updateData: any = {};
     if (chalanData.customerId !== undefined) updateData.customerId = chalanData.customerId;
     if (chalanData.projectId !== undefined) updateData.projectId = chalanData.projectId;
@@ -912,15 +909,11 @@ export class DatabaseStorage implements IStorage {
         : chalanData.totalAmount;
     }
 
-    const [updated] = await db
-      .update(chalans)
-      .set(updateData)
-      .where(eq(chalans.id, id))
-      .returning();
+    await db.update(chalans).set(updateData).where(eq(chalans.id, id));
+    const [updated] = await db.select().from(chalans).where(eq(chalans.id, id));
 
     if (!updated) return undefined;
 
-    // If items are provided, delete old items and insert new ones
     if (items && items.length > 0) {
       await db.delete(chalanItems).where(eq(chalanItems.chalanId, id));
       const itemsInsert: (typeof chalanItems.$inferInsert)[] = items.map(item => ({
@@ -937,23 +930,17 @@ export class DatabaseStorage implements IStorage {
   }
 
   async cancelChalan(id: number, reason: string): Promise<Chalan | undefined> {
-    const [updated] = await db
-      .update(chalans)
-      .set({ isCancelled: true, cancelReason: reason })
-      .where(eq(chalans.id, id))
-      .returning();
+    await db.update(chalans).set({ isCancelled: true, cancelReason: reason }).where(eq(chalans.id, id));
+    const [updated] = await db.select().from(chalans).where(eq(chalans.id, id));
     return updated;
   }
 
   async updateChalanStatus(id: number, isCancelled: boolean): Promise<Chalan | undefined> {
-    const [updated] = await db
-      .update(chalans)
-      .set({ 
-        isCancelled, 
-        cancelReason: isCancelled ? "Cancelled via status toggle" : null 
-      })
-      .where(eq(chalans.id, id))
-      .returning();
+    await db.update(chalans).set({ 
+      isCancelled, 
+      cancelReason: isCancelled ? "Cancelled via status toggle" : null 
+    }).where(eq(chalans.id, id));
+    const [updated] = await db.select().from(chalans).where(eq(chalans.id, id));
     return updated;
   }
 
@@ -976,7 +963,9 @@ export class DatabaseStorage implements IStorage {
       revisedBy: userId || null,
     };
     
-    const [created] = await db.insert(chalanRevisions).values(revisionInsert).returning();
+    const result = await db.insert(chalanRevisions).values(revisionInsert);
+    const insertId = (result as any)[0]?.insertId;
+    const [created] = await db.select().from(chalanRevisions).where(eq(chalanRevisions.id, insertId));
 
     return created;
   }
@@ -1052,7 +1041,9 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createDesignation(name: string): Promise<Designation> {
-    const [created] = await db.insert(designations).values({ name }).returning();
+    const result = await db.insert(designations).values({ name });
+    const insertId = (result as any)[0]?.insertId;
+    const [created] = await db.select().from(designations).where(eq(designations.id, insertId));
     return created;
   }
 
@@ -1062,37 +1053,10 @@ export class DatabaseStorage implements IStorage {
     return chalan;
   }
 
-  // Update Chalan
-  async updateChalan(id: number, chalanData: Partial<InsertChalan>, items?: (InsertChalanItem & { id?: number })[]): Promise<Chalan | undefined> {
-    const [updated] = await db.update(chalans).set(chalanData).where(eq(chalans.id, id)).returning();
-    
-    if (!updated) return undefined;
-
-    if (items) {
-      // Delete existing items and insert new ones
-      await db.delete(chalanItems).where(eq(chalanItems.chalanId, id));
-      
-      if (items.length > 0) {
-        await db.insert(chalanItems).values(
-          items.map(item => ({
-            chalanId: id,
-            description: item.description,
-            quantity: item.quantity,
-            rate: item.rate,
-            amount: item.amount,
-          }))
-        );
-      }
-    }
-
-    return updated;
-  }
-
   // History/Audit trail
   async getHistory(filters?: { from?: string; to?: string; entityType?: string; action?: string }): Promise<any[]> {
     const results: any[] = [];
 
-    // Get booking logs if no entityType filter or entityType is 'booking'
     if (!filters?.entityType || filters.entityType === 'booking') {
       const bookingConditions = [];
       if (filters?.from) {
@@ -1135,7 +1099,6 @@ export class DatabaseStorage implements IStorage {
       });
     }
 
-    // Get chalan revisions if no entityType filter or entityType is 'chalan'
     if (!filters?.entityType || filters.entityType === 'chalan') {
       const chalanConditions = [];
       if (filters?.from) {
@@ -1146,14 +1109,13 @@ export class DatabaseStorage implements IStorage {
         toDate.setHours(23, 59, 59, 999);
         chalanConditions.push(lte(chalanRevisions.createdAt, toDate));
       }
-      // Chalan revisions are always 'revision' action
       if (filters?.action && filters.action !== 'revision') {
         // Skip chalan revisions if action filter doesn't match
       } else {
         let chalanQuery = db
           .select()
           .from(chalanRevisions)
-          .leftJoin(users, eq(chalanRevisions.userId, users.id))
+          .leftJoin(users, eq(chalanRevisions.revisedBy, users.id))
           .leftJoin(chalans, eq(chalanRevisions.chalanId, chalans.id))
           .leftJoin(projects, eq(chalans.projectId, projects.id));
 
@@ -1168,10 +1130,10 @@ export class DatabaseStorage implements IStorage {
             id: row.chalan_revisions.id,
             entityType: 'chalan',
             entityId: row.chalan_revisions.chalanId,
-            entityName: row.chalans?.chalanNo || `Chalan #${row.chalan_revisions.chalanId}`,
+            entityName: row.chalans?.chalanNumber || `Chalan #${row.chalan_revisions.chalanId}`,
             action: 'revision',
             changes: row.chalan_revisions.changes,
-            userId: row.chalan_revisions.userId,
+            userId: row.chalan_revisions.revisedBy,
             userName: row.users?.username || null,
             createdAt: row.chalan_revisions.createdAt,
           });
@@ -1179,9 +1141,7 @@ export class DatabaseStorage implements IStorage {
       }
     }
 
-    // Sort all results by createdAt descending
     results.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-
     return results.slice(0, 200);
   }
 }
