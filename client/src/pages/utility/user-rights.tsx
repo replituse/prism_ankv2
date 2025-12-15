@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { Shield, Save, RotateCcw, User, Check, X } from "lucide-react";
+import { Shield, Save, RotateCcw, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -69,7 +69,7 @@ export default function UserRightsPage() {
     enabled: !!selectedUserId,
   });
 
-  useState(() => {
+  useEffect(() => {
     if (userAccess.length > 0) {
       const matrix: AccessMatrix = {};
       userAccess.forEach((access) => {
@@ -82,8 +82,12 @@ export default function UserRightsPage() {
         };
       });
       setAccessMatrix(matrix);
+      setHasChanges(false);
+    } else if (selectedUserId) {
+      setAccessMatrix({});
+      setHasChanges(false);
     }
-  });
+  }, [userAccess, selectedUserId]);
 
   const saveMutation = useMutation({
     mutationFn: async () => {

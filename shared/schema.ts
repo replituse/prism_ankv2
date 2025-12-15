@@ -25,7 +25,7 @@ export const users = mysqlTable("users", {
   username: text("username").notNull(),
   password: text("password").notNull(),
   securityPin: text("security_pin").notNull(),
-  role: mysqlEnum("role", ["admin", "gst", "non_gst"]).notNull().default("non_gst"),
+  role: mysqlEnum("role", ["admin", "gst", "non_gst", "custom"]).notNull().default("non_gst"),
   companyId: int("company_id").references(() => companies.id),
   fullName: text("full_name"),
   email: text("email"),
@@ -320,6 +320,18 @@ export const userModuleAccessRelations = relations(userModuleAccess, ({ one }) =
   }),
 }));
 
+// Helper to transform date fields - accepts string or Date, returns string for MySQL DATE columns
+const dateStringSchema = z.union([
+  z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be in YYYY-MM-DD format"),
+  z.date().transform(d => d.toISOString().split('T')[0]),
+  z.null(),
+]).nullable().optional();
+
+const requiredDateStringSchema = z.union([
+  z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be in YYYY-MM-DD format"),
+  z.date().transform(d => d.toISOString().split('T')[0]),
+]);
+
 // Insert Schemas
 export const insertCompanySchema = createInsertSchema(companies).omit({ id: true, createdAt: true });
 export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true });
@@ -328,11 +340,21 @@ export const insertCustomerSchema = createInsertSchema(customers).omit({ id: tru
 export const insertCustomerContactSchema = createInsertSchema(customerContacts).omit({ id: true });
 export const insertProjectSchema = createInsertSchema(projects).omit({ id: true, createdAt: true });
 export const insertRoomSchema = createInsertSchema(rooms).omit({ id: true, createdAt: true });
-export const insertEditorSchema = createInsertSchema(editors).omit({ id: true, createdAt: true });
-export const insertBookingSchema = createInsertSchema(bookings).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertEditorSchema = createInsertSchema(editors).omit({ id: true, createdAt: true }).extend({
+  joinDate: dateStringSchema,
+  leaveDate: dateStringSchema,
+});
+export const insertBookingSchema = createInsertSchema(bookings).omit({ id: true, createdAt: true, updatedAt: true }).extend({
+  bookingDate: requiredDateStringSchema,
+});
 export const insertBookingLogSchema = createInsertSchema(bookingLogs).omit({ id: true, createdAt: true });
-export const insertEditorLeaveSchema = createInsertSchema(editorLeaves).omit({ id: true, createdAt: true });
-export const insertChalanSchema = createInsertSchema(chalans).omit({ id: true, createdAt: true, chalanNumber: true });
+export const insertEditorLeaveSchema = createInsertSchema(editorLeaves).omit({ id: true, createdAt: true }).extend({
+  fromDate: requiredDateStringSchema,
+  toDate: requiredDateStringSchema,
+});
+export const insertChalanSchema = createInsertSchema(chalans).omit({ id: true, createdAt: true, chalanNumber: true }).extend({
+  chalanDate: requiredDateStringSchema,
+});
 export const insertChalanItemSchema = createInsertSchema(chalanItems).omit({ id: true, chalanId: true });
 export const insertChalanRevisionSchema = createInsertSchema(chalanRevisions).omit({ id: true, createdAt: true, revisionNumber: true, chalanId: true });
 export const insertUserModuleAccessSchema = createInsertSchema(userModuleAccess).omit({ id: true });

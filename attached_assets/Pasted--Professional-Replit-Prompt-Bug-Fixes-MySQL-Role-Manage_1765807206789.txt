@@ -1,0 +1,229 @@
+✅ Professional Replit Prompt – Bug Fixes + MySQL + Role Management
+
+Context
+I already have an existing working software project (UI, flow, modules are already designed).
+Your task is to fix bugs, data validation issues, and role-based access, without changing the major logic, UI design, or workflows.
+
+The project must strictly use MySQL (not SQLite, not Prisma, not MongoDB).
+
+🔐 Database & Environment Rules (VERY IMPORTANT)
+
+Strictly use MySQL
+
+Use MySQL driver (mysql2 / sequelize / typeorm – whichever is already used).
+
+Do NOT introduce any new database type.
+
+Replit Temporary MySQL Setup
+
+Inside Replit, create:
+
+Automatic database & tables only for testing.
+
+Use environment variables:
+
+DB_HOST
+DB_USER
+DB_PASSWORD
+DB_NAME
+
+
+Add a clear config file so that when I download the project, I can manually change DB credentials easily.
+
+Do NOT change table names or existing schema unless required for bug fixing.
+
+If any column type is wrong, fix it safely using migrations or ALTER TABLE.
+
+🐞 BUG FIXES (Based on Uploaded Screenshots)
+1️⃣ Editor Master – Join Date & Leave Date Error
+
+Problem:
+
+When Join Date or Leave Date is selected, API returns:
+
+Expected date, received string
+
+If dates are empty, editor is saved successfully.
+
+Fix Required:
+
+Ensure frontend sends proper date format (YYYY-MM-DD).
+
+Ensure backend:
+
+Parses dates correctly.
+
+Column types are DATE (not VARCHAR).
+
+Add safe validation:
+
+Join Date ≤ Leave Date
+
+Leave Date can be NULL.
+
+Do NOT change UI layout.
+
+2️⃣ Leaves Entry – Date Validation Error
+
+Problem:
+
+While adding editor leave, error occurs:
+
+Expected date, received string
+
+Fix Required:
+
+Fix frontend → backend date serialization.
+
+Ensure:
+
+fromDate and toDate are stored as DATE.
+
+fromDate ≤ toDate.
+
+Ensure editor availability logic still works.
+
+3️⃣ Booking Page – Cannot Create Booking
+
+Problem:
+
+Booking creation fails with:
+
+Expected date, received string
+
+Fix Required:
+
+Fix bookingDate, fromTime, toTime handling.
+
+Ensure:
+
+Date → YYYY-MM-DD
+
+Time → HH:mm:ss
+
+Backend validation must accept correct formats.
+
+Booking logic (conflicts, tentative, confirmed) must remain unchanged.
+
+4️⃣ Chalan Entry – Chalan Date Error
+
+Problem:
+
+Chalan creation fails due to date validation.
+
+Fix Required:
+
+Fix chalanDate field handling.
+
+Ensure DB column type is DATE.
+
+Items, quantity, rate logic must remain unchanged.
+
+🔑 User Rights & Role Management (CRITICAL FEATURE)
+5️⃣ User Rights – Checkbox Not Showing Existing Access
+
+Problem:
+
+In User Rights Management:
+
+Existing permissions are NOT checked.
+
+UI always loads unchecked boxes.
+
+Fix Required:
+
+When role/user is selected:
+
+Fetch saved permissions from DB.
+
+Pre-check corresponding checkboxes.
+
+Save & update permissions correctly.
+
+➕ Add New Role: custom
+
+Requirements:
+
+Roles must be:
+
+admin
+
+gst
+
+nongst
+
+custom (NEW)
+
+In User Management:
+
+Allow creating a user with role = custom.
+
+In User Rights:
+
+When selecting custom role:
+
+Admin can assign module-level & action-level access:
+
+Example:
+
+Editor Report → View only
+
+Room Master → View only
+
+No Create / Edit / Delete access
+
+Save permissions in DB.
+
+Strict Role Enforcement
+
+UI:
+
+Hide buttons user doesn’t have access to.
+
+Backend:
+
+Block API access if permission is missing.
+
+Example:
+
+Custom role with “View only” → cannot edit/delete via API.
+
+🎨 UI & Logic Constraints
+
+❌ Do NOT redesign UI
+
+❌ Do NOT change navigation
+
+❌ Do NOT break existing flows
+
+✅ Only fix bugs and missing logic
+
+✅ Keep UI consistent with current design
+
+🧪 Final Expectations
+
+All forms should submit without date errors
+
+Editor, Leave, Booking, Chalan must work correctly
+
+User Rights must:
+
+Load existing permissions
+
+Enforce strict role-based access
+
+Project should:
+
+Run fully inside Replit using MySQL
+
+Be easy to export and connect to production MySQL later
+
+⚠️ IMPORTANT
+
+Before final output:
+
+Test all modules end-to-end
+
+Ensure no console/API errors
+
+Ensure permissions are enforced both frontend & backend

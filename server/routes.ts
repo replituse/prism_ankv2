@@ -4,7 +4,7 @@ import { storage } from "./storage";
 import { insertCustomerSchema, insertProjectSchema, insertRoomSchema, insertEditorSchema, insertBookingSchema, insertEditorLeaveSchema, insertChalanSchema, insertChalanItemSchema, insertUserSchema, loginSchema } from "@shared/schema";
 import { z } from "zod";
 
-type UserRole = "admin" | "gst" | "non_gst";
+type UserRole = "admin" | "gst" | "non_gst" | "custom";
 
 interface AuthenticatedRequest extends Request {
   userId?: number;
